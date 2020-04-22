@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html>
+
+<!-- VISTA DE ARTICULOS PARA ALTAS, BAJAS Y MODIFICACIONES -->
+<!-- fecha: 2018 -->
+<!-- version: 1.0-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:icecore="http://www.icefaces.org/icefaces/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components">
+	
+<h:head>
+	<title>Artículo - EvM3</title>
+	 <h:outputStylesheet name="css/posicion.css" />
+</h:head>
+
+<!--APUNTE: <ace:theme value="dark-hive"/>   opté por hacerlo en el fichero descriptor pq quiero el mismo 
+	para toda la ap-->
+
+<h:body>
+
+	<h:form id="formu_articulos" value="#{articulo_formulario}">
+
+	<ui:include src="#{FacesContext.getCurrentInstance().getExternalContext()}/resources/plantillaMenu.xhtml"/>
+	
+		<!--*************** CONTENEDOR TABSET (PESTAÑAS) *****************-->
+			
+	<ace:tabSet id="contendor_pestanas" showEffect="Slide" 
+		showEffectLength="1500" clientSide="true" styleClass="articulo_panel" >
+		
+	<!--  ****************	PESTAÑA DE ALTAS, BAJAS Y MOFICACIONES *********************  -->
+	
+		<ace:tabPane id="pestana1" label="Altas, Bajas y Modificar" >
+							
+							<!-- PANEL GRID-->				
+			<h:panelGrid id="panel_alta" columns="2" cellpadding="6" styleClass="articulo_panel">	
+		
+						<!-- CAMPOS DEL FORMULARIO -->
+		<!-- ID DEL ART -->
+			<ace:textEntry id="idArt" value="#{articulo_formulario.art_dto.codigoArticulo}" 
+			label="Id Art:" labelPosition="top" requiredIndicator="*" indicatorPosition="labelLeft"	required="true"
+			requiredMessage="ID DEL ART ES OBLIGATORIO">
+				<ace:clientValidateLength maximum="5"/>
+				<ace:tooltip id="tooltip1" speechBubble="true" styleClass="bubble" value="Máx. 5 dígitos"/>
+			</ace:textEntry>	
+							
+		<!-- PRECIO DEL ART -->	
+			<ace:textEntry id="price" value="#{articulo_formulario.art_dto.precioUnidad}" 
+			disabled="#{articulo_formulario.disabled}" label="Precio:" labelPosition="top"/>
+		<!-- CANTIDAD -->
+			<ace:textEntry id="amount" value="#{articulo_formulario.art_dto.cantidad}" 
+			disabled="#{articulo_formulario.disabled}" label="Cantidad:" labelPosition="top"/>
+			
+		<!-- DESCRIPCIÓN DEL ART -->
+			<ace:textAreaEntry id="descripcionF" value="#{articulo_formulario.art_dto.descripcion}" 
+				label="Descripción: " labelPosition="top" maxlength="40" rows="2" requiredIndicator="*"
+				indicatorPosition="labelLeft"
+				disabled="#{articulo_formulario.disabled}" required="#{articulo_formulario.requerido}" 
+				requiredMessage="La descripción es obligatoria en altas y modificaciones">
+				<ace:clientValidateLength maximum="40"/>			
+			</ace:textAreaEntry>
+			</h:panelGrid>
+			
+			
+				  <!-- ***************** BOTON DE EJECUTAR ******************* -->	  
+			<h:panelGrid id="panel_boton" styleClass="panel_boton">	  
+			<ace:pushButton id="boton_exe" value="Ejecutar" 
+				actionListener="#{articulo_formulario.accion}">
+				<ace:ajax execute="pestana1"/>
+			</ace:pushButton>
+			</h:panelGrid>
+			
+  					<!--***** PANEL DE LOS RADIO BUTTONS *****-->	
+			<ace:radioButtons id="radios"   value="#{articulo_formulario.rb_selected}" 
+			 valueChangeListener="#{articulo_formulario.mtoSeleccion}" styleClass="rboton_grupo">	
+			<!-- CONTENIDO ESTATICO -->
+				<f:selectItem itemValue="alta" itemLabel="Alta"/>	
+				<f:selectItem itemValue="baja" itemLabel="Baja"/>	
+				<f:selectItem itemValue="modificacion" itemLabel="Modificar"/>		
+				<ace:ajax event="valueChange" execute="@this" render="panel_alta"/>	
+				<ace:tooltip id="tooltip2" speechBubble="true" styleClass="bubble" 
+				value="Para bajas solo se requiere el ID"/>
+			</ace:radioButtons>
+			
+					 		<!-- ************** MENSAJES **************** -->
+   	 	<ace:growlMessages  id="Msgs" infoStyle="green" errorStyle="red" for="@all" showDetail="false" hideEffectDuration="2000"
+    	redisplay="false" displayDuration="3000"/>  	
+
+		
+		</ace:tabPane>
+	
+		<!--  ****************	PESTAÑA DE CONSULTAS *********************   -->
+		<ace:tabPane id="pestana2" label="Consultas" styleClass="articulo_panel" >	
+		<h:panelGrid id="panel_consultas" columns="1" cellpadding="8" >
+		
+		<!-- ******************** COMBO CON LA LISTA DE ARTS *********************-->
+		<ace:simpleSelectOneMenu id="lista_arts" value="#{articulo_formulario.art_dto.codigoArticulo}"
+		  valueChangeListener="#{articulo_formulario.consultaById}" 
+			label="Artículo:" labelPosition="left">
+				
+					<!-- CONTENIDO ESTATICO -->
+				<f:selectItem id="sin_seleccion" itemValue="none" 
+					itemLabel="Seleccione un Articulo" noSelectionOption="true"/>				
+				<!-- CONTENIDO DINAMICO - CARGA DEL COMBO CON LA LISTA DE ARTS -->
+				<f:selectItems id="lista_articulos" 
+					value="#{articulo_formulario.lista_articulos}" />	
+				<!-- PETICION VIA AJAX AL SERVIDOR PARA QUE REALICE LA ACTUALIZACION DE LOS CAMPOS
+			AL CAMBIAR LA SELECCION DEL COMBO -->
+				<ace:ajax event="valueChange" execute="@this"
+					render="precio cantidad id" />	
+		</ace:simpleSelectOneMenu>	
+			
+			
+							<!--******** CAMPOS EN CONSULTA*********-->
+			
+			<ace:textEntry id="precio" label="Precio:" labelPosition="left" readonly="true"
+			value="#{articulo_formulario.art_dto.precioUnidad}"/>
+			<ace:textEntry id="cantidad" label="Cantidad" labelPosition="left" readonly="true"
+			value="#{articulo_formulario.art_dto.cantidad}"/>
+			<ace:textEntry id="id" label="Id Art.:" labelPosition="left" readonly="true"
+			value="#{articulo_formulario.art_dto.codigoArticulo}" />
+		</h:panelGrid>	
+
+		</ace:tabPane>
+	</ace:tabSet>
+          
+</h:form>
+</h:body>
+
+</html>

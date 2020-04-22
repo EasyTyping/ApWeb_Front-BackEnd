@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html>
+
+<!-- DATATABLE DE JSF PARA ARTICULOS-->
+<!-- fecha: 2018 -->
+<!-- version: 1.0-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" lang="en"
+	xmlns:icecore="http://www.icefaces.org/icefaces/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components">
+
+<h:head>
+	<title>Tabla de Artículos - EvM3</title>
+	<!-- CARGA DEL CSS -->
+	<h:outputStylesheet name="css/posicion.css" />
+</h:head>
+<h:body>
+	<!-- FORMULARIO CONTENEDOR DEL DATATABLE -->
+	<h:form id="formu_articulos">
+	
+		<ui:include src="#{FacesContext.getCurrentInstance().getExternalContext()}/resources/plantillaMenu.xhtml"/>
+
+		<ace:dataTable id="tabla_articulos" styleClass="posicion_dt"
+			value="#{articuloTabla_bean.lista_articulos}" var="articulo" rows="7" 
+			paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="true"
+			emptyMessage="Base de datos fuera de linea"
+			reorderableColumns="false"
+			resizableColumns="true" selectionMode="multiple"
+			doubleClickSelect="true">
+		<!-- CABECERA DE DOS FILAS -->
+		<ace:columnGroup id="cabeceras">
+			<ace:row>
+				<ace:column headerText="LISTADO DE ARTÍCULOS" colspan="4" />
+			</ace:row>
+			<ace:row>
+				<ace:column headerText="Descripción" 
+				sortBy="#{articulo.descripcion}"/>
+				<ace:column headerText="Id" 
+				sortBy="#{articulo.codigoArticulo}"
+				filterBy="#{pedido.codigoArticulo}" filterMatchMode="exact"/>
+				<ace:column headerText="Precio/Unidad" />
+				<ace:column headerText="Cantidad"/>
+			</ace:row>
+		</ace:columnGroup>
+			<!-- COLUMNAS DE LA TABLA -->
+			<ace:column id="col_descripcion">
+				<h:outputText id="descripción_articulo" value="#{articulo.descripcion}" />
+			</ace:column>
+			<ace:column id="col_ID">
+				<h:outputText id="articulo_id" value="#{articulo.codigoArticulo}" />
+			</ace:column>
+			<ace:column id="col_precio">
+				<h:outputText id="precio_articulo"
+					value="#{articulo.precioUnidad}" />
+			</ace:column>
+			<ace:column id="col_cantidad">
+				<h:outputText id="cantidad_articulo" value="#{articulo.cantidad}" />
+			</ace:column>
+		</ace:dataTable>
+	
+	</h:form>
+</h:body>
+</html>

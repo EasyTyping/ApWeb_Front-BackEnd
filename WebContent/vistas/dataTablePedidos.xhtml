@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html>
+
+<!-- DATATABLE DE JSF PARA ARTICULOS-->
+<!-- fecha: 2018 -->
+<!-- version: 1.0-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" lang="en"
+	xmlns:icecore="http://www.icefaces.org/icefaces/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components">
+
+<h:head>
+	<title>Tabla de Pedidos - EvM3</title>
+	<!-- CARGA DEL CSS -->
+	<h:outputStylesheet name="css/posicion.css" />
+</h:head>
+<h:body>
+	<!-- FORMULARIO CONTENEDOR DEL DATATABLE -->
+	<h:form id="formu_pedidos">
+	
+		<ui:include src="#{FacesContext.getCurrentInstance().getExternalContext()}/resources/plantillaMenu.xhtml"/>
+
+		<ace:dataTable id="tabla_pedidos" styleClass="posicion_dt"
+			value="#{pedidosTabla_bean.lista_pedidos}" var="pedido" rows="5" 
+			paginator="true" paginatorPosition="bottom" paginatorAlwaysVisible="true"
+			emptyMessage="Base de datos fuera de linea"
+			reorderableColumns="false"
+			resizableColumns="true" selectionMode="multiple"
+			doubleClickSelect="true">
+		<!-- CABECERA DE DOS FILAS -->
+		<ace:columnGroup id="cabeceras">
+			<ace:row>
+				<ace:column headerText="LISTADO DE PEDIDOS" colspan="6" />
+			</ace:row>
+			<ace:row>
+				
+				<ace:column headerText="Id" 
+				sortBy="#{pedido.numeroPedido}"
+				filterBy="#{pedido.numeroPedido}" filterMatchMode="exact"/>
+				<ace:column headerText="Cliente"/>
+				<ace:column headerText="Fecha"/>
+				<ace:column headerText="IVA %"/>
+				<ace:column headerText="Total IVA" />
+				<ace:column headerText="Total"/>			
+			</ace:row>
+			
+		</ace:columnGroup>
+			<!-- COLUMNAS DE LA TABLA -->
+			<ace:column id="col_ID">
+				<h:outputText id="pedido_id" value="#{pedido.numeroPedido}"/>
+			</ace:column>
+				<ace:column id="col_cliente">
+				<h:outputText id="cliente_pedido" value="#{pedido.cliente.codigoCliente}" />
+			</ace:column>
+			
+			<ace:column id="col_fecha">
+				<h:outputText id="fecha_pedido" value="#{pedido.fecha}" />
+			</ace:column>
+			
+			<ace:column id="col_porcentaje">
+				<h:outputText id="porcentaje_pedido"
+					value="#{pedido.porcentajeIva}"/>
+			</ace:column>
+			<ace:column id="col_ivaPedido">
+				<h:outputText id="iva_pedido" value="#{pedido.ivaPedido}" />
+			</ace:column>
+			
+			<ace:column id="col_total">
+				<h:outputText id="total_pedido" value="#{pedido.totalFactura}" />
+			</ace:column>
+			
+		</ace:dataTable>
+	
+	</h:form>
+</h:body>
+</html>

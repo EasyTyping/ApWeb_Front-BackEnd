@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html>
+
+<!-- VISTA DE PEDIDOS PARA ALTAS, BAJAS Y MODIFICACIONES -->
+<!-- fecha: 2018 -->
+<!-- version: 1.0-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:icecore="http://www.icefaces.org/icefaces/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components">
+	
+<h:head>
+	<title>Pedidos - EvM3</title>
+	 <h:outputStylesheet name="css/posicion.css" />
+</h:head>
+<!-- <ace:theme value="dark-hive"/>  Asi puedo cambiar el theme 
+	pero opte por hacerlo en el fichero descriptor pq quiero el mismo 
+	para toda la ap-->
+
+<h:body>
+
+	<h:form id="formu_pedidos" value="#{pedido_formulario}">
+	<!-- PLANTILLA DE LA CABECERA Y EL MENU-->
+	<ui:include src="#{FacesContext.getCurrentInstance().getExternalContext()}/resources/plantillaMenu.xhtml"/>
+	
+	<!-- CONTENEDOR  -->		
+	<ace:panel id="panel_contenedor" header="Pedidos" headerAlign="center" styleClass="posicion_panelPedidos">
+
+	<!--########################### FORMULARIO DE PEDIDO #############################-->				
+		<h:panelGrid id="panel_alta" columns="3" cellpadding="8" styleClass="posicion_panel">	
+								
+								<!-- CAMPOS DEL FORMULARIO-->	
+		<!-- NUMERO PEDIDO -->
+			<ace:textEntry id="numPedido" value="#{pedido_formulario.pedido_dto.numeroPedido}" 
+			label="Id Pedido:" labelPosition="top" requiredIndicator="*" indicatorPosition="labelLeft"	
+			required="true" requiredMessage="El ID del Pedido es obligatorio!!" results="3">
+				<ace:tooltip id="tooltip2" global="false" speechBubble="true" styleClass="bubble"
+			value="Máx. 5 dígitos"/>	
+				<ace:clientValidateLength maximum="5"/>		
+			</ace:textEntry>	
+			
+		<!-- FECHA DEL PEDIDO -->	
+			<ace:textEntry id="fecha" value="#{pedido_formulario.pedido_dto.fecha}"
+			 label="Fecha:" labelPosition="top" readonly="true"
+			disabled="#{pedido_formulario.disabled}">	
+				<f:convertDateTime type="date"  pattern="dd/MM/yyyy"/>
+			</ace:textEntry>
+			
+					
+		<!-- PORCENTAJE IVA -->
+			<ace:textEntry  id="porcentajeIva" value="#{pedido_formulario.pedido_dto.porcentajeIva}" 
+			 label="Porcentaje IVA:" labelPosition="top" disabled="#{pedido_formulario.disabled}"
+			 readonly="#{pedido_formulario.sololectura}" >
+			  <ace:ajax render="@this ivaPedido totalFactura" listener="#{pedido_formulario.hayIva}"/>
+			 </ace:textEntry>	
+		 
+		<!-- IVA PEDIDO -->
+			<ace:textEntry  id="ivaPedido"
+			 value="#{pedido_formulario.pedido_dto.ivaPedido}" 
+			 label="IVA del Pedido:" labelPosition="top" disabled="#{pedido_formulario.disabled}"
+			 readonly="true"/>
+						 
+		<!-- TOTAL FACTURA -->
+			<ace:textEntry  id="totalFactura" value="#{pedido_formulario.pedido_dto.totalFactura}" 
+			label="Total:" labelPosition="top" readonly="true" disabled="#{pedido_formulario.disabled}" />
+				
+				<!--******************* COMBO CÓDIGO CLIENTE *********************-->	
+		<ace:simpleSelectOneMenu id="lista_clients" value="#{pedido_formulario.cliente_dto.codigoCliente}" 
+			disabled="#{pedido_formulario.disabled}" valueChangeListener="#{pedido_formulario.consultaClienteById}" 
+			label="Cliente:" labelPosition="left" required="#{pedido_formulario.requerido}" 
+			readonly="#{pedido_formulario.sololectura}" 
+			requiredIndicator="*" indicatorPosition="labelLeft">
+				<!--CONTENIDO ESTATICO -->
+				<f:selectItem id="sin_seleccion" itemValue="none" 
+					itemLabel="Seleccione un Cliente" noSelectionOption="true"/>				
+				<!--  CONTENIDO DINAMICO - CARGA DEL COMBO CON LA LISTA DE CLIENTES -->
+				<f:selectItems id="lista_clientes" value="#{pedido_formulario.lista_clientes}" />		
+				<ace:ajax render="@this"/>
+		</ace:simpleSelectOneMenu>	
+		</h:panelGrid>		
+			
+			  <!-- ***************** BOTON DE EJECUTAR ******************* -->
+				  
+			<h:panelGrid id="panel_boton" styleClass="panel_boton">	  
+			<ace:pushButton id="boton_exe" value="Ejecutar" 
+				actionListener="#{pedido_formulario.accion}">
+				<ace:ajax execute="panel_alta"/>
+				</ace:pushButton>
+			</h:panelGrid>
+			
+  			<!--************ PANEL DE LOS RADIO BUTTONS DE ACCION **********-->
+  			
+  		<h:panelGrid>	
+			<ace:radioButtons id="radios" value="#{pedido_formulario.rb_selected}" 
+			 valueChangeListener="#{pedido_formulario.mtoSeleccion}" styleClass="rboton_grupoPedido">	
+			<!-- CONTENIDO ESTATICO -->
+				<f:selectItem itemValue="alta" itemLabel="Alta"/>	
+				<f:selectItem itemValue="baja" itemLabel="Baja"/>	
+				<f:selectItem itemValue="modificacion" itemLabel="Modificar"/>	
+				<f:selectItem itemValue="consulta" itemLabel="Consultar"/>	
+				<ace:ajax event="valueChange" execute="@this" render="@form"/>	
+			<ace:tooltip id="tooltip1" global="false" speechBubble="true" styleClass="bubble"
+			value="Para bajas y consultas solo se requiere el ID"/>
+			</ace:radioButtons>
+		</h:panelGrid>		
+
+
+<!-- ########################## DATATABLE DE LINEAS AÑADIDAS ####################################-->
+
+	<ace:dataTable id="tabla_articulos" styleClass="posicion_dtlinea" 
+	value="#{pedido_formulario.lista_lineas}" var="linea" rows="5"  >
+       <ace:columnGroup id="cabeceras">
+		<ace:row>
+			<ace:column colspan="6">
+			<h:outputText value="Debe añadir al menos una línea de pedido para dar de alta:" styleClass="frase" />
+			<ace:column>
+			
+		<!-- ################ FORMULARIO PARA AÑADIR LINEAS AL PEDIDO  ######################## -->
+
+	<h:panelGrid id="panel_lineas" columns="3" cellpadding="2" border="1" rules="groups" 
+	styleClass="linea_grid" header="Añadir linea">	
+	
+							<!-- CAMPOS DEL FORMULARIO-->
+		<!-- NUMERO LINEA -->
+		<ace:textEntry id="numLinea" value="#{pedido_formulario.linea_dto.codigoLineaPedido}" 
+			label="Id Línea: " disabled="#{pedido_formulario.disabled}" readonly="#{pedido_formulario.sololectura}"
+			labelPosition="left" requiredIndicator="*" required="#{pedido_formulario.requerido}" 
+			indicatorPosition="labelLeft" requiredMessage="El ID es obligatorio" >	
+			<ace:clientValidateLength maximum="10"/>
+			<ace:tooltip id="tooltip2" global="false" speechBubble="true" styleClass="bubble"
+			value="Máx. 10 dígitos"/>
+		</ace:textEntry>	
+							
+				<!--******************** COMBO ARTICULOS ********************-->
+		<ace:simpleSelectOneMenu id="lista_arts" value="#{pedido_formulario.art_dto.codigoArticulo}"
+			disabled="#{pedido_formulario.disabled}" valueChangeListener="#{pedido_formulario.consultaArtById}" 
+			label="Artículo:" labelPosition="left" required="#{pedido_formulario.requerido}" 
+			requiredIndicator="*" indicatorPosition="labelLeft"	readonly="#{pedido_formulario.sololectura}">
+				<!-- CONTENIDO ESTATICO -->
+				<f:selectItem id="sin_seleccion" itemValue="none" 
+					itemLabel="Seleccione un Articulo" noSelectionOption="true"/>				
+				<!-- CONTENIDO DINAMICO - CARGA DEL COMBO CON LA LISTA DE ARTS -->
+				<f:selectItems id="lista_articulos" value="#{pedido_formulario.lista_articulos}" />		
+				<ace:ajax render="@this precioLinea"/>
+		</ace:simpleSelectOneMenu>		
+			
+		<!-- DESCUENTO -->
+			<ace:textEntry id="descuento" label="Descuento:" labelPosition="left"
+			 value="#{pedido_formulario.linea_dto.descuento}"  
+				disabled="#{pedido_formulario.disabled}" readonly="#{pedido_formulario.sololectura}">
+				<ace:tooltip id="tooltip3" global="false" speechBubble="true" styleClass="bubble"
+				value="Porcentaje  Ej. 30%, 5%"/>
+			</ace:textEntry>
+			 			
+		<!-- PRECIO DEL UNIDAD -->	
+			<ace:textEntry id="precioLinea" label="Precio:" labelPosition="left"
+			value="#{pedido_formulario.linea_dto.precioUnidad}" 
+			disabled="#{pedido_formulario.disabled}" readonly="true"/>	
+			
+		<!-- NUMERO UNIDADES -->	
+			<ace:textEntry  id="unidades"  label="Unidades:"  labelPosition="left"
+			value="#{pedido_formulario.linea_dto.numeroUnidades}" readonly="#{pedido_formulario.sololectura}"
+			disabled="#{pedido_formulario.disabled}" />
+	
+			<!--************* BOTON AÑADIR LINEA DE PEDIDO ***************-->
+  
+			<ace:pushButton id="boton_add" value="Añadir" 
+				actionListener="#{pedido_formulario.agregarLinea}">
+				<ace:ajax execute="panel_lineas" render="tabla_articulos :formu_pedidos:totalFactura :formu_pedidos:ivaPedido"/>
+			</ace:pushButton>
+
+		</h:panelGrid>
+	</ace:column>
+	</ace:column>
+		</ace:row>
+		<!-- ******************* COLUMNAS DE LA TABLA ***********************-->
+			<ace:row>
+				<ace:column headerText="ID Linea"/>
+				<ace:column headerText="Artículo" />
+				<ace:column headerText="Precio/Unidad" />
+				<ace:column headerText="Unidades"/>
+				<ace:column headerText="Descuento"/>	
+				<ace:column headerText="Total"/>		
+			</ace:row>
+		</ace:columnGroup>
+			
+	<ace:column id="colum_idlinea">
+			<h:outputText id="idlinea" value="#{linea.codigoLineaPedido}"/>
+	</ace:column>
+	<ace:column id="colum_articulo">
+			<h:outputText id="descripcionArt" value="#{linea.articulo.descripcion}"/>
+	</ace:column>
+	<ace:column id="colum_precio">
+			<h:outputText id="precio2" value="#{linea.precioUnidad}"/>
+	</ace:column> 
+	<ace:column id="colum_unidades">	
+		 <h:outputText id="numUnidades2" value="#{linea.numeroUnidades}"/>
+	</ace:column>	
+	<ace:column id="colum_descuento">
+		<h:outputText id="descuento2" value="#{linea.descuento}"/>
+	</ace:column>
+   			<ace:column id="colum_total">
+		<h:outputText id="totalLinea" value="#{linea.total}"/>
+	</ace:column>
+	
+    </ace:dataTable>  
+   										<!-- ******* MENSAJES *********-->
+		<ace:growlMessages  id="Msgs" infoStyle="green" errorStyle="red" for="@all" showDetail="false" 
+    	redisplay="false" displayDuration="5000" />  
+   </ace:panel>
+       
+  <!--    <ace:dialog id="dialog" visible="#{pedido_formulario.visible}" modal="true" 
+			resizable="false" showEffect="clip" hideEffect="fade" width="400" redisplay="false">
+            <h:outputText id="mensaje" value="#{pedido_formulario.mensaje}" styleClass="#{pedido_formulario.color}"/>             
+	</ace:dialog>   -->  
+
+</h:form>
+</h:body>
+
+</html>

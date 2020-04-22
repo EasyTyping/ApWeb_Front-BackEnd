@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName" default-lazy-init="true"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- FICHERO DE CONFIGURACION DE SPRING -->
+	<!-- ****** AUTOR: JOSÉ BEJARANO GARCIA ****** -->
+	<!-- ****** FECHA: 2018 ****** -->
+	<!-- ****** VERSION: 1.0 ****** -->
+	
+	
+	<!-- COMPONENTE DE LECTURA DE PROPERTIES -->
+	<bean id="gestor_properties"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<!-- RUTA Y NOMBRE DE PROPERTIES A LEER -->
+		<property name="location"
+			value="classpath:com/spring/datos-conexion.properties" />
+	</bean>
+	
+	<!-- **** CONEXION A LA BASE DATOS **** -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="configLocation"
+			value="classpath:com/config/hibernate.cfg.xml">
+		</property>
+	</bean>
+
+	<!-- ***** ZONA DE TRANSACCIONES ***** -->
+	<!-- **** GESTOR TRANSACCIONAL **** -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager" />
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- *** RUTA DE CLASES CON ANOTACIONES DE SPRING *** -->
+	<context:component-scan base-package="com.hibernate.modelo" />
+	<context:component-scan base-package="com.hibernate.dao" />
+	<context:component-scan base-package="com.hibernate.dao.ext" />
+	
+	
+
+	<!-- **** DATASOURCE REQUERIDO POR TRANSACTION MANAGER **** -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${driver.oracle}" />
+		<property name="url" value="${url.oracle}" />
+		<property name="username" value="${usuario.oracle}" />
+		<property name="password" value="${clave.usuario}" />
+	</bean>
+
+</beans>
+	
+	

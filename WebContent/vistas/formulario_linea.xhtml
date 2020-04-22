@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html>
+
+<!-- VISTA DE ARTICULOS PARA ALTAS, BAJAS Y MODIFICACIONES -->
+<!-- fecha: 2018 -->
+<!-- version: 1.0-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:icecore="http://www.icefaces.org/icefaces/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components">
+	
+<h:head>
+	<title>Lineas de Pedido - EvM3</title>
+	 <h:outputStylesheet name="css/posicion.css" />
+</h:head>
+<!-- <ace:theme value="dark-hive"/>  Asi puedo cambiar el theme 
+	pero opte por hacerlo en el fichero descriptor pq quiero el mismo 
+	para toda la ap-->
+<div id="contenido">
+<h:body>
+
+	<h:form id="formu_lineas" value="#{linea_formulario}">
+	<!-- PLANTILLA DE LA CABECERA Y EL MENU-->
+	<ui:include src="#{FacesContext.getCurrentInstance().getExternalContext()}/resources/plantillaMenu.xhtml"/>
+	
+	<!--***************************** CONTENEDOR  *****************************-->		
+	<ace:panel id="panel_contenedor" header="Lineas de Pedido" headerAlign="center" styleClass="posicion_panelLineas">
+
+		<!--********************* PANEL GRID **************************-->	
+				
+		<h:panelGrid id="panel_campos" columns="2" cellpadding="8" border="0" rules="groups" styleClass="linea_grid">	
+	
+						<!-- CAMPOS DEL FORMULARIO-->
+		<!-- NUMERO LINEA -->
+		<ace:textEntry id="numLinea" 
+			value="#{linea_formulario.linea_dto.codigoLineaPedido}" label="Id Línea: "
+			labelPosition="left" required="true" requiredIndicator="*"
+			indicatorPosition="labelLeft" requiredMessage="El campo id es obligatorio">	
+			<ace:clientValidateLength maximum="10"/>
+			<ace:tooltip id="tooltip" global="false" speechBubble="true" styleClass="bubble"
+			value="Máx. 10 dígitos"/>
+		</ace:textEntry>	
+			
+		<!--******************** COMBO ARTICULOS ********************-->
+		<ace:simpleSelectOneMenu id="lista_arts" value="#{linea_formulario.art_dto.codigoArticulo}"
+			disabled="#{linea_formulario.disabled}" valueChangeListener="#{linea_formulario.consultaArtById}" 
+			label="Artículo:" labelPosition="left" required="#{linea_formulario.requerido}" 
+			requiredIndicator="*" indicatorPosition="labelLeft" readonly="#{linea_formulario.noread}">
+				<!-- CONTENIDO ESTATICO -->
+				<f:selectItem id="sin_seleccion" itemValue="none" 
+					itemLabel="Seleccione un Articulo" noSelectionOption="true"/>				
+				<!-- CONTENIDO DINAMICO - CARGA DEL COMBO CON LA LISTA DE ARTS -->
+				<f:selectItems id="lista_articulos" value="#{linea_formulario.lista_articulos}" />		
+				<ace:ajax render="@this precioLinea"/>
+		</ace:simpleSelectOneMenu>		
+			
+		<!-- DESCUENTO -->
+			<ace:textEntry id="descuento" label="Descuento:" labelPosition="left"
+			 value="#{linea_formulario.linea_dto.descuento}"  
+			disabled="#{linea_formulario.disabled}" 
+			title="Porcentaje  Ej. 30%, 5%"/>
+			
+		<!-- PRECIO DEL UNIDAD -->	
+			<ace:textEntry id="precioLinea" label="Precio:" labelPosition="left"
+			 value="#{linea_formulario.linea_dto.articulo.precioUnidad}" 
+			disabled="#{linea_formulario.disabled}" readonly="true"/>	
+			
+		<!-- NUMERO UNIDADES -->	
+			<ace:textEntry  id="unidades"  label="Unidades:"  labelPosition="left"
+			 value="#{linea_formulario.linea_dto.numeroUnidades}"	 
+			disabled="#{linea_formulario.disabled}"/>
+			
+			
+			<!-- *************************  COMBO PEDIDOS *************************** -->				
+							<!-- VALOR Y ESCUCHADOR PARA EL COMBO-->
+		<ace:simpleSelectOneMenu id="lista_peds" value="#{linea_formulario.pedido_dto.numeroPedido}"
+			valueChangeListener="#{linea_formulario.consultaPedidoById}" readonly="#{linea_formulario.noread}"
+			label="Pedido:" labelPosition="left" disabled="#{linea_formulario.disabled}" 
+			required="#{linea_formulario.requerido}" requiredIndicator="*" indicatorPosition="labelLeft">
+				<!-- CONTENIDO ESTATICO -->
+				<f:selectItem id="sin_seleccion1" itemValue="none" 
+					itemLabel="Seleccione un Pedido" noSelectionOption="true"/>				
+				<!-- CONTENIDO DINAMICO - CARGA DEL COMBO CON LA LISTA DE PEDIDOS -->
+				<f:selectItems value="#{linea_formulario.lista_pedidos}" />	
+				<ace:ajax render="@this"/>	
+		</ace:simpleSelectOneMenu>			
+		</h:panelGrid>
+		
+		
+			  <!-- ***************** BOTON DE EJECUTAR ******************* -->
+				  
+			<h:panelGrid id="panel_boton" styleClass="panel_boton">	  
+			<ace:pushButton id="boton_exe" value="Ejecutar" 
+				actionListener="#{linea_formulario.accion}">
+				<ace:ajax execute="panel_campos" />
+				</ace:pushButton>
+			</h:panelGrid>
+			
+  					<!--***** PANEL DE LOS RADIO BUTTONS *****-->	
+  		<h:panelGrid>	
+			<ace:radioButtons id="radios" value="#{linea_formulario.rb_selected}" 
+			 valueChangeListener="#{linea_formulario.mtoSeleccion}" styleClass="rboton_grupo">	
+			<!-- CONTENIDO ESTATICO -->
+				<f:selectItem itemValue="alta" itemLabel="Alta"/>	
+				<f:selectItem itemValue="baja" itemLabel="Baja"/>	
+				<f:selectItem itemValue="modificacion" itemLabel="Modificar"/>	
+				<f:selectItem itemValue="consulta" itemLabel="Consultar"/>	
+				<ace:ajax event="valueChange" render="panel_campos @this" execute="@this" />
+				<ace:tooltip id="tooltip2" global="false" speechBubble="true" styleClass="bubble"
+			value="Para bajas y consultas solo se requiere el ID"/>	
+			</ace:radioButtons>		
+		</h:panelGrid>	
+		</ace:panel>
+		
+					 		<!-- ************** MENSAJES **************** -->
+   	 	<ace:growlMessages  id="Msgs" infoStyle="green" errorStyle="red" for="@all" showDetail="false" hideEffectDuration="2000"
+    	redisplay="false" displayDuration="3000"/>  	
+
+		 <!--  <ace:dialog id="dialog" visible="#{linea_formulario.visible}" modal="true" redisplay="false" 
+			resizable="false" showEffect="clip" hideEffect="fade" width="400">
+                 <h:outputText id="mensaje" value="#{linea_formulario.mensaje}" styleClass="#{linea_formulario.color}"/>             
+		</ace:dialog> -->
+ 
+</h:form>
+
+</h:body>
+</div>
+</html>

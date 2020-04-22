@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html>
+
+<!-- PLANTILLA PARA NO REPETIR EL CÓDIGO DEL MENU EN CADA PÁGINA -->
+<!-- fecha: 2019 -->
+<!-- version: 1.0-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:icecore="http://www.icefaces.org/icefaces/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components">
+	
+<h:head>
+	<title>Plantilla Menu - EvM3</title>
+	 <h:outputStylesheet name="css/Posicion.css" />
+</h:head>
+
+<h:body>
+<form id="formu_menuplantilla">
+	<ui:composition>
+	<div id="contenido">
+			<!-- MENU ESTATICO EN CONTENEDOR HORIZONTAL -->
+			<ace:menuBar id="menu_horizontal" autoSubmenuDisplay="false"
+				effect="slide" effectDuration="500">
+				<!-- CONTENIDO DEL MENUBAR (SUBMENUS Y MENUITEM) -->	
+					<!-- SUBMENU PARA PEDIDOS -->
+				<ace:submenu id="submenu1" label="Pedidos">
+					<ace:menuItem id="opCrudPedido" value="Altas, bajas y modificar"
+					url="#{FacesContext.getCurrentInstance().getExternalContext()}/vistas/formulario_pedidos.xhtml"/>
+					<ace:menuItem id="opListaPedidos" value="Consultar lista" 
+					url="#{FacesContext.getCurrentInstance().getExternalContext()}/vistas/dataTablePedidos.xhtml"/>		
+				</ace:submenu>	
+					<!-- SUBMENU PARA ARTÍCULOS -->
+				<ace:submenu id="submenu2" label="Artículos">
+					<ace:menuItem id="opAltasBajas" value="Altas, bajas y modificar" 
+					url="#{FacesContext.getCurrentInstance().getExternalContext()}/vistas/formulario_articulo.xhtml" />
+					<ace:menuItem id="opListaArticulos" value="Consultar lista"
+					url="#{FacesContext.getCurrentInstance().getExternalContext()}/vistas/dataTableArticulos.xhtml"/>			
+				<!--  	<ace:menuItem id="opOtrasConsultas" value="Otras consultas"/>-->
+				</ace:submenu>	
+				<!-- SUBMENU PARA LÍNEAS DE PEDIDO -->
+				<ace:submenu id="submenu3" label="Linea de Pedido">
+					<ace:menuItem id="opCrudLinea" value="Altas, bajas y modificar"
+					url="#{FacesContext.getCurrentInstance().getExternalContext()}/vistas/formulario_linea.xhtml"/>	
+					<ace:menuItem id="opListaLineas" value="Consultar lista" 
+					url="#{FacesContext.getCurrentInstance().getExternalContext()}/vistas/dataTableLineas.xhtml"/>				
+				</ace:submenu>
+			</ace:menuBar>
+				
+	<h:graphicImage value="#{FacesContext.getCurrentInstance().getExternalContext()}/resources/images/tit2.png"  
+	styleClass="centrar_titulo"/>
+<!-- APUNTE: también se puede hacer:value="#{resource['images:tit2.png']}"-->
+</div>
+</ui:composition>
+</form>
+</h:body>
+
+</html>

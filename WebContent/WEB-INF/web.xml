@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	
+	<display-name>MODULO3</display-name>
+	
+	<!-- FICHERO DE CONFIGURACION DE APLICACION WEB JSF  -->
+	<!-- ****** AUTOR: JOSÉ BEJARANO GARCIA ****** -->
+	<!-- ****** FECHA: 2018 ****** -->
+	<!-- ****** VERSION: 1.0 ****** -->
+
+
+	<!-- ******** ZONA DE CONTROLADORES (SERVLETS) ******* -->
+	<!-- CONTROLADOR PRINCIPAL DE JSF -->
+	<servlet>
+		<servlet-name>Faces Servlet</servlet-name>
+		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>*.xhtml</url-pattern>
+	</servlet-mapping>
+	<!-- CONTROLADOR ESPECIFICO PARA ICEFACES -->
+	<servlet>
+		<servlet-name>Resource Servlet</servlet-name>
+		<servlet-class>com.icesoft.faces.webapp.CompatResourceServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Resource Servlet</servlet-name>
+		<url-pattern>/xmlhttp/*</url-pattern>
+	</servlet-mapping>
+ 
+
+<!-- **** ARRANQUE DE SPRING EN WEB (OBLIGATORIO) **** -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<!-- PARAMETRO QUE INFORMA DEL NOMBRE Y POSICION DEL DESCRIPTOR DE SPRING -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:com/spring/modelo.xml</param-value>
+	</context-param>
+<!-- **** FIN ARRANQUE DE SPRING EN WEB (OBLIGATORIO) **** -->
+	
+  <!-- VISTA DE LA PRIMERA PETICION -->
+  <welcome-file-list>
+    <welcome-file>index.xhtml</welcome-file>
+  </welcome-file-list>
+  
+  <!-- OPCIONES DE INICIO DE LA AP PARA JSF -->
+	<context-param>
+		<description>ACTIVA LAS OPCIONES DE SEGUIMIENTO EXTRAS EN DESARROLLO JSF 2</description>
+		<param-name>javax.faces.PROJECT_STAGE</param-name>
+		<param-value>Development</param-value>
+	</context-param>
+	<context-param>
+		<param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+		<param-value>server</param-value>
+	</context-param>
+	<context-param>
+		<description>ACTIVA/DESACTIVA LOS COMENTARIOS EN LAS VISTAS</description>
+		<param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
+		<param-value>true</param-value>
+	</context-param>
+	<context-param>
+    	<param-name>javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
+   		<param-value>true</param-value>
+	</context-param>
+	
+	<!-- CONFIGURACION INTERNA DE ICEFACES -->
+	
+	<!-- PARA SELECCIONAR EL TEMA DE ICEFACES -->
+	<context-param>
+	<param-name>org.icefaces.ace.theme</param-name>
+		<param-value>dark-hive</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>org.icefaces.coalesceResources</param-name>
+		<param-value>false</param-value>
+	</context-param>
+	<context-param>
+		<param-name>org.icefaces.strictSessionTimeout</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<!-- ** FIN ZONA OPCIONES INICIALES CONFIGURACION DE LA APLICACION ** -->
+  
+</web-app>

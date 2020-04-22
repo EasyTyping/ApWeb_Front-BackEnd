@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html>
+
+<!-- PAGINA DE INICIO DE LA APLICACIÓN -->
+<!-- fecha: 2018 -->
+<!-- version: 1.0-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" 
+	xmlns:icecore="http://www.icefaces.org/icefaces/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components">
+	
+<h:head>
+	<title>Página de Inicio - Pedidos</title>
+	 <h:outputStylesheet name="css/posicion.css" />
+</h:head>
+
+<h:body>
+
+<h:form id="formu_inicio" >	
+	<ui:include src="/resources/plantillaMenu.xhtml"/>
+	<div id="inicio" class="inicio" style="background-color: rgba(67, 67, 67, 0.7); font: 16px Arial" >
+	<p align="center"> APLICACIÓN BASADA EN EL PATRÓN MVC</p><p>Para el desarrollo se ha utilizado 
+	Eclipse Neon 3 (4.6) y JDK 1.8_u161 (jre 1.8_161). Además se han utilizado los siguientes Frameworks y librerías:</p> 
+	<ul><li>HIBERNATE 4.1.4 Y SPRING 4.3.9</li>
+		<li>JSF 2.2 Y ICEFACES 4</li> </ul>	
+	<p align="justify"> El nivel del LOG4J se ha dejado a TRACE para obtener una información detallada por consola 
+	(puede cambiarlo si lo desea en el propeties). Del mismo modo, puede consultar el fichero c:/java_bejarano/log.txt.<br />
+	<br /> Se ha incluido un DTO simplificado y un DAO para la tabla Clientes<BR />
+	<br/> Tanto al borrar o modificar un pedido, como un artículo, se borran y modifican sus líneas asociadas.<br />  
+	<br />  Para los mensajes al usuario se ha utilizado el objeto FacesMessage.Se ha utilizado una plantilla para el menú y un CSS para el posicionamiento. <br />
+	</p>
+	</div>	
+</h:form>
+</h:body>
+</html>
